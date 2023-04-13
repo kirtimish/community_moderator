@@ -1,12 +1,12 @@
 const Sequelize = require('sequelize');
-const { Generator } = require('snowflake-generator');
+const { Snowflake } = require('@theinternetfolks/snowflake');
 const sequelize=require('../database');
 
 const Community=sequelize.define('community',{
     id:{
         type: Sequelize.STRING,
-        default: new Generator(),
-        allowedNull: false,
+        defaultValue: Snowflake.generate(),
+        allowNull: false,
         primaryKey: true
     },
     name:{
