@@ -1,11 +1,9 @@
 const Sequelize=require('sequelize')
-const { Snowflake } = require('@theinternetfolks/snowflake');
 const sequelize=require('../database')
 
 const User=sequelize.define('users', {
     id:{
         type: Sequelize.STRING,
-        defaultValue: Snowflake.generate(),
         allowNull:false,
         primaryKey: true
     },

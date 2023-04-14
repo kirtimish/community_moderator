@@ -1,11 +1,9 @@
 const Sequelize = require('sequelize');
-const { Snowflake } = require('@theinternetfolks/snowflake');
 const sequelize=require('../database');
 
 const Community=sequelize.define('community',{
     id:{
         type: Sequelize.STRING,
-        defaultValue: Snowflake.generate(),
         allowNull: false,
         primaryKey: true
     },
@@ -17,14 +15,6 @@ const Community=sequelize.define('community',{
         type:Sequelize.STRING,
         allowedNull: false,
         unique:true
-    },
-    owner:{
-        type: Sequelize.STRING,
-        references: {
-            model: 'users',
-            key: 'Id',
-          },
-        allowedNull: false,
     }
 });
 

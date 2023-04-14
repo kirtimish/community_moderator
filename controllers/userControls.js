@@ -1,4 +1,5 @@
 const User = require('../models/user')
+const { Snowflake } = require('@theinternetfolks/snowflake');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -8,6 +9,8 @@ function generateToken(id){
 
 exports.signup = async(req,res,next) => {
     const { name, email,password } = req.body
+    const id = Snowflake.generate();
+    
     if(!name || !email || !password){
         res.status(403).json({ success:false, message:'values are missing' })
     }
@@ -19,7 +22,7 @@ exports.signup = async(req,res,next) => {
         } else {
             bcrypt.hash(password,10, async(err,hash) => {
                 if(!err){
-                    const data = await User.create({ name, email, password:hash })
+                    const data = await User.create({ id, name, email, password:hash })
                     res.status(201).json({ data, success:true, message: 'signup successfull'})
                 }
             })

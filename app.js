@@ -22,7 +22,12 @@ app.use('/v1/member',memberRoutes)
 app.use('/v1/role',roleRoutes)
 
 //associations
-Community.belongsToMany(User,{through: Member})
+User.hasMany(Community, {foreignKey: 'owner'});
+Community.belongsTo(User, {
+  foreignKey: 'owner'
+});
+
+Community.belongsToMany(User, { through: Member})
 User.belongsToMany(Community,{through: Member})
 
 Role.hasMany(Member)
