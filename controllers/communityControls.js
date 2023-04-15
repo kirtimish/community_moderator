@@ -46,12 +46,64 @@ exports.getAllCommunities = async(req,res,next) => {
         const { page, size } = req.query;
         const { limit, offset } = getPagination(page, size);
         const condition = null
-        const response = await Community.findAndCountAll({where: condition,limit, offset, attributes: ['id', 'name', 'slug','createdAt','updatedAt'], include: [
+        const response = await Community.findAndCountAll({where: condition, limit, offset, attributes: ['id', 'name', 'slug','createdAt','updatedAt'], include: [
             { model: User, attributes: ['id', 'name'] }
         ]})
         const data = getPagingData(response, page, limit);
         res.status(200).json({ success: true, data})
     } catch (err) {
         res.status(500).json({ success: false, err})
+    }
+}
+
+exports.getAllMembers = async(req,res,next) => {
+    try {
+        const id = req.params.id;
+        const { page, size } = req.query;
+        const { limit, offset } = getPagination(page, size);
+        console.log(id,'>> community id')
+        
+        const response = await Member.findAndCountAll({ where: { communityId: id },limit, offset })
+        const data = getPagingData(response, page, limit);
+        res.status(200).json({ success: true, content:data })
+    } catch (error) {
+        res.status(200).json({ success: false, message:'Internal Server Error' })
+    }
+}
+
+exports.getMyOwnedCommunities = async(req,res,next) => {
+    try {
+        const { page, size } = req.query;
+        const { limit, offset } = getPagination(page, size);
+        const response = await Community.findAndCountAll({ where: { owner: req.user.id} , limit, offset});
+        // console.log(data, 'my oned communities')
+        const data = getPagingData(response, page, limit)
+        res.status(200).json({ success:true, data})
+    } catch (err) {
+        res.status(500).json({ success: false, err})
+    }
+}
+
+exports.getMyJoinedCommunities = async(req,res,next) => {
+    try {
+        const { page, size } = req.query;
+        const { limit, offset } = getPagination(page, size);
+        const memberRole = await Role.findOne({ where: { name: 'Community Member' } });
+        // console.log(memberRole.id, 'id of memberrole')
+        const result = await Member.findAll({ attributes: ['communityId'], where:{userId: req.user.id, roleId: memberRole.id}});
+        // console.log(result,'>>>')
+        let communityIdArray = [];
+        result.forEach(id => {
+            communityIdArray.push(id.communityId)
+        });
+        // console.log(communityIdArray)
+
+        const response= await Community.findAndCountAll({attributes:['id','name'],where:{id:communityIdArray}, limit, offset, include: [
+            { model: User, attributes: ['id', 'name'] }
+        ]});
+        const data = getPagingData(response, page, limit)
+        res.status(200).json({ status: true, content: data})
+    } catch (error) {
+        res.status(500).json({ status: false, message:'internal Server error'})
     }
 }
